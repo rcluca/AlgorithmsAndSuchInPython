@@ -39,9 +39,9 @@ imap.login(imap_user, imap_pass)
 ## select a specific folder
 status, data = imap.select('Flight Deal')
 
-## retrieve and print all messages
+## retrieve and print all unread messages
 msg = ""
-typ, data = imap.search(None, 'ALL')
+typ, data = imap.search(None, '(UNSEEN)')
 
 ## create an empty list to store FlightInfo objects
 allFlights = []
@@ -108,6 +108,9 @@ for num in data[0].split():
 
     except:
         pass
-    
+   
 imap.close()
 imap.logout()
+
+for flight in allFlights:
+    print flight.date, flight.price
