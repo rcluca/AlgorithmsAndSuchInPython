@@ -22,7 +22,26 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Code Snippets\2048.py" />
+    <Compile Include="Code Snippets\Algorithms.py" />
+    <Compile Include="Code Snippets\CacheTest.py" />
+    <Compile Include="Code Snippets\cece.py" />
+    <Compile Include="Code Snippets\Cookie Clicker.py" />
+    <Compile Include="Code Snippets\poc_grid.py" />
+    <Compile Include="Code Snippets\poc_queue.py" />
+    <Compile Include="Code Snippets\poc_ttt_provided.py" />
+    <Compile Include="Code Snippets\ResourcesVSTime.py" />
+    <Compile Include="Code Snippets\Test.py" />
+    <Compile Include="Code Snippets\Test2.py" />
+    <Compile Include="Code Snippets\Tic Tac Toe %28Minimax%29.py" />
+    <Compile Include="Code Snippets\TicTacToe.py" />
+    <Compile Include="Code Snippets\Word Wrangler.py" />
+    <Compile Include="Code Snippets\Yahtzee.py" />
+    <Compile Include="Code Snippets\Zombie Apocalyse.py" />
     <Compile Include="PythonApp.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Code Snippets\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
