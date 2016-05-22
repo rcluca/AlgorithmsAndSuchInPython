@@ -21,7 +21,19 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Algorithms\bs.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Algorithms\MergeSortAlgo.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Algorithms\q1.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Algorithms\q2.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Algorithms\QuickSortAlgo.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Code Snippets\2048.py" />
@@ -41,6 +53,9 @@
     <Compile Include="Code Snippets\Yahtzee.py" />
     <Compile Include="Code Snippets\Zombie Apocalyse.py" />
     <Compile Include="Projects\FlightEmailRetrieval.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Projects\__init__.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="PythonApp.py" />

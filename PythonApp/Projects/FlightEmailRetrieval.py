@@ -1,4 +1,4 @@
-import imaplib, email, re
+import imaplib, email, re, getpass
 from HTMLParser import HTMLParser
 
 class MLStripper(HTMLParser):
@@ -9,6 +9,10 @@ class MLStripper(HTMLParser):
         self.fed.append(d)
     def get_data(self):
         return ''.join(self.fed)
+    def strip_tags(html):
+        s = MLStripper()
+        s.feed(html)
+        return s.get_data()
 
 class FlightInfo():
     date = ""
@@ -21,96 +25,92 @@ class FlightInfo():
         self.departingCities = []
         self.destinationCities = []
 
-def strip_tags(html):
-    s = MLStripper()
-    s.feed(html)
-    return s.get_data()
+class Flight():
+    def get_flights(self):
+        imap_host = "imap.mail.yahoo.com"
+        imap_user = "rc_luca@yahoo.com"
+        imap_pass = getpass.getpass("Please enter password: ")
 
-imap_host = "imap.mail.yahoo.com"
-imap_user = "rc_luca@yahoo.com"
-imap_pass = input("Please enter password: ")
+        ## open a connection 
+        imap = imaplib.IMAP4_SSL(imap_host)
 
-## open a connection 
-imap = imaplib.IMAP4_SSL(imap_host)
+        ## login
+        imap.login(imap_user, imap_pass)
 
-## login
-imap.login(imap_user, imap_pass)
+        ## select a specific folder
+        status, data = imap.select('Flight Deal')
 
-## select a specific folder
-status, data = imap.select('Flight Deal')
+        ## retrieve and print all unread messages
+        msg = ""
+        typ, data = imap.search(None, '(UNSEEN)')
 
-## retrieve and print all unread messages
-msg = ""
-typ, data = imap.search(None, '(UNSEEN)')
+        ## create an empty list to store FlightInfo objects
+        allFlights = []
 
-## create an empty list to store FlightInfo objects
-allFlights = []
+        for num in data[0].split():
 
-for num in data[0].split():
+            try:
 
-    try:
-
-        # get message
-        typ, data = imap.fetch(num, '(RFC822)')
+                # get message
+                typ, data = imap.fetch(num, '(RFC822)')
     
-        # parse message into required info
-        msg = data[0][1]
-        match = re.search(r"You are receiving this email because you elected to receive emails from", msg)
-        if (match != None):
-            msg = msg[match.regs[0][1]:]
-        match = re.search(r"http://theflightdeal.us3.list-manage1.com", msg)
-        if (match != None):
-            msg = msg[:match.regs[0][0]]
-        msg = msg.replace("\r\n", "").replace("=2C", ", ")
-        msg = re.sub("http:.* ","",msg)
+                # parse message into required info
+                msg = data[0][1]
+                match = re.search(r"You are receiving this email because you elected to receive emails from", msg)
+                if (match != None):
+                    msg = msg[match.regs[0][1]:]
+                match = re.search(r"http://theflightdeal.us3.list-manage1.com", msg)
+                if (match != None):
+                    msg = msg[:match.regs[0][0]]
+                msg = msg.replace("\r\n", "").replace("=2C", ", ")
+                msg = re.sub("http:.* ","",msg)
     
-        msgList = msg.split("*")
+                msgList = msg.split("*")
 
-        # use list splicing to remove : from end then regex to replace everything before the space before date
-        date = re.sub(".* ","",msgList[0][:len(msgList[0])-1])
+                # use list splicing to remove : from end then regex to replace everything before the space before date
+                date = re.sub(".* ","",msgList[0][:len(msgList[0])-1])
 
-        for m in msgList[2:]:
-            subMsg1 = m.split("=E2=80=93")
+                for m in msgList[2:]:
+                    subMsg1 = m.split("=E2=80=93")
         
-            idx = 0
-            first = subMsg1[0].replace("=", "").strip()
+                    idx = 0
+                    first = subMsg1[0].replace("=", "").strip()
 
-            # skip if Fare Gone
-            if (first[:11] != "[FARE GONE]"):
+                    # skip if Fare Gone
+                    if (first[:11] != "[FARE GONE]"):
 
-                # initialize flight object
-                flight = FlightInfo()
-                flight.date = date
+                        # initialize flight object
+                        flight = FlightInfo()
+                        flight.date = date
 
-                # jump to next index if first index is "The Shorthaul"
-                if (first == "The Shorthaul"):
-                    idx += 1
+                        # jump to next index if first index is "The Shorthaul"
+                        if (first == "The Shorthaul"):
+                            idx += 1
 
-                # get airline
-                flight.airline = subMsg1[idx].replace("=", "").strip()
-                idx += 1
+                        # get airline
+                        flight.airline = subMsg1[idx].replace("=", "").strip()
+                        idx += 1
         
-                # get price and departing cities
-                priceCityMsg = subMsg1[idx].split(":")
-                flight.price = int(priceCityMsg[0].replace(r"$", "").strip())
-                departingCitiesList = priceCityMsg[1].replace(r"=", "").split(r"/")
-                for city in departingCitiesList:
-                    flight.departingCities.append(city.strip())
-                idx += 1
+                        # get price and departing cities
+                        priceCityMsg = subMsg1[idx].split(":")
+                        flight.price = int(priceCityMsg[0].replace(r"$", "").strip())
+                        departingCitiesList = priceCityMsg[1].replace(r"=", "").split(r"/")
+                        for city in departingCitiesList:
+                            flight.departingCities.append(city.strip())
+                        idx += 1
 
-                # get destination
-                destinationCitiesList = subMsg1[idx].replace(r"==2E", "").replace(r"=", "").replace(r".", "").replace(r"(and vice versa)", "").replace(r" Roundtrip,  including all Taxes", "").split(r"/")
-                for city in destinationCitiesList:
-                    flight.destinationCities.append(city.strip())
+                        # get destination
+                        destinationCitiesList = subMsg1[idx].replace(r"==2E", "").replace(r"=", "").replace(r".", "").replace(r"(and vice versa)", "").replace(r" Roundtrip,  including all Taxes", "").split(r"/")
+                        for city in destinationCitiesList:
+                            flight.destinationCities.append(city.strip())
 
-                # add flight object to running list
-                allFlights.append(flight)
+                        # add flight object to running list
+                        allFlights.append(flight)
 
-    except:
-        pass
+            except:
+                pass
    
-imap.close()
-imap.logout()
+        imap.close()
+        imap.logout()
 
-for flight in allFlights:
-    print flight.date, flight.price
+        return allFlights
